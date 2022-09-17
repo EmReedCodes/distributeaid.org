@@ -6,9 +6,6 @@ on:
 permissions:
   statuses: write
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   build:
     name: 'Build'
@@ -189,6 +186,8 @@ jobs:
 
       - name: run Lighthouse CI
         continue-on-error: true
+        env:
+          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           yarn add @lhci/cli
           npx lhci autorun
