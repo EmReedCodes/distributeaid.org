@@ -6,13 +6,17 @@ import MainMenu from '@components/nav/MainMenu/MainMenu'
 
 interface Props {
   pageTitle: string
+  pageDescription?: string
+  className?: string
   footer?: ReactNode
 }
 
 const SimpleLayout: FunctionComponent<PropsWithChildren<Props>> = ({
   pageTitle,
+  pageDescription,
   footer,
   children,
+  className,
 }) => (
   <>
     <Helmet
@@ -23,14 +27,17 @@ const SimpleLayout: FunctionComponent<PropsWithChildren<Props>> = ({
     >
       <meta
         name="description"
-        content="Humanitarian aid delivery reimagined. By supporting a huge network of grassroots organisations, we ensure that donations get to where they are needed most."
+        content={
+          pageDescription ??
+          'Humanitarian aid delivery reimagined. By supporting a huge network of grassroots organisations, we ensure that donations get to where they are needed most.'
+        }
       ></meta>
     </Helmet>
     <Favicon />
     <header>
       <MainMenu />
     </header>
-    <main>{children}</main>
+    <main className={className}>{children}</main>
     {footer ? footer : <Footer />}
   </>
 )

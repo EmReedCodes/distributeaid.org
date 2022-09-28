@@ -1,8 +1,11 @@
 const path = require('path')
 const schema = require('./gatsby/customize-schema')
-const transformers = require('./gatsby/transform-nodes')
+const transformers = require('./gatsby/transform-nodes.js')
 const resolvers = require('./gatsby/create-resolvers')
 const pages = require('./gatsby/create-pages')
+const {
+  createFundraisersFromMarkdown,
+} = require('./gatsby/transformers/fundraisers.js')
 
 /*
 Customize the GraqphQL Schema
@@ -23,6 +26,7 @@ exports.onCreateNode = (gatsbyUtils) => {
   transformers.createTeamRolesFromMarkdown(gatsbyUtils)
   transformers.createTeamMembersFromMarkdown(gatsbyUtils)
   transformers.createLineItemsFromJson(gatsbyUtils)
+  createFundraisersFromMarkdown(gatsbyUtils)
 }
 
 /*
