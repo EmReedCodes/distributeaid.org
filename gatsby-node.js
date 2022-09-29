@@ -5,7 +5,8 @@ const resolvers = require('./gatsby/create-resolvers')
 const pages = require('./gatsby/create-pages')
 const {
   createFundraisersFromMarkdown,
-} = require('./gatsby/transformers/fundraisers.js')
+} = require('./gatsby/fundraisers/transformers.js')
+const { createFundraisersPages } = require('./gatsby/fundraisers/pages.js')
 
 /*
 Customize the GraqphQL Schema
@@ -47,6 +48,7 @@ exports.createPages = async (gatsbyUtils) => {
   await pages.createRegionPages(gatsbyUtils)
   await pages.createSubregionPages(gatsbyUtils)
   await pages.createRoutePages(gatsbyUtils)
+  await createFundraisersPages(gatsbyUtils)
 }
 
 /*
