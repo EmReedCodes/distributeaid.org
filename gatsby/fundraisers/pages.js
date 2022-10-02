@@ -12,8 +12,10 @@ const createFundraisersPages = async ({ graphql, actions: { createPage } }) => {
           raised
           currency
           abstract
-          hero
-          gallery
+          gallery {
+            url
+            alt
+          }
           body
         }
       }
@@ -33,7 +35,6 @@ const createFundraisersPages = async ({ graphql, actions: { createPage } }) => {
         raised: fundraiser.raised,
         currency: fundraiser.currency,
         abstract: fundraiser.abstract,
-        hero: fundraiser.hero,
         gallery: fundraiser.gallery,
         body: fundraiser.body,
       },
