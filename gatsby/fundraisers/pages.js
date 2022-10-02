@@ -1,8 +1,13 @@
 const path = require('path')
+const { getSrc } = require('gatsby-plugin-image')
 
 const createFundraisersPages = async ({ graphql, actions: { createPage } }) => {
   const {
-    data: { fundraisers, thumbnails350px },
+    data: {
+      fundraisers: { nodes: fundraisers },
+      thumbnails350px: { nodes: thumbnails350px },
+      size600px: { nodes: size600px },
+    },
   } = await graphql(`
     query Fundraisers {
       fundraisers: allDaFundraiser {
@@ -33,11 +38,43 @@ const createFundraisersPages = async ({ graphql, actions: { createPage } }) => {
           gatsbyImageData(width: 350)
         }
       }
+      size600px: allImageSharp(
+        filter: { original: { src: { glob: "/static/**" } } }
+      ) {
+        nodes {
+          parent {
+            ... on File {
+              absolutePath
+            }
+          }
+          gatsbyImageData(width: 600)
+        }
+      }
     }
   `)
 
-  fundraisers.nodes.forEach((fundraiser) => {
+  fundraisers.forEach((fundraiser) => {
     console.info(`creating fundraiser page at /donate/${fundraiser.name}`)
+
+    // Make inline images responsive
+    const allImages = fundraiser.body.matchAll(/!\[[^\]]+\]\((?<url>[^)]+)\)/g)
+    const replacements = {}
+    for (const match of allImages) {
+      console.log(match.groups)
+      const gatsbyImageData = size600px.find(({ parent: { absolutePath } }) =>
+        absolutePath.endsWith(match.groups.url),
+      ).gatsbyImageData
+      if (gatsbyImageData === undefined) {
+        console.error(
+          `Failed to find size600px gatsbyImageData for photo ${match.groups.url}!`,
+        )
+      }
+      replacements[match.groups.url] = getSrc(gatsbyImageData)
+    }
+    const body = Object.entries(replacements)
+      .sort(([k1], [k2]) => k1.localeCompare(k2))
+      .reduce((body, [k, v]) => body.replaceAll(k, v), fundraiser.body)
+
     createPage({
       path: `/donate/${fundraiser.name}`,
       component: path.resolve(`./src/templates/FundraiserPage.tsx`),
@@ -50,12 +87,12 @@ const createFundraisersPages = async ({ graphql, actions: { createPage } }) => {
         currency: fundraiser.currency,
         abstract: fundraiser.abstract,
         gallery: fundraiser.gallery.map((photo) => {
-          const gatsbyImageData = thumbnails350px.nodes.find(
+          const gatsbyImageData = thumbnails350px.find(
             ({ parent: { absolutePath } }) => absolutePath.endsWith(photo.url),
           ).gatsbyImageData
           if (gatsbyImageData === undefined) {
             console.error(
-              `Failed to find gatsbyImageData for photo ${photo.url}!`,
+              `Failed to find thumbnails350px gatsbyImageData for photo ${photo.url}!`,
             )
           }
           return {
@@ -63,7 +100,7 @@ const createFundraisersPages = async ({ graphql, actions: { createPage } }) => {
             gatsbyImageData,
           }
         }),
-        body: fundraiser.body,
+        body,
       },
     })
   })
