@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { StaticImage } from 'gatsby-plugin-image'
-import openCollectiveImage from '../images/opencollective_logo.svg'
+import openCollectiveImage from '../../src/images/opencollective_logo.svg'
 import directTransferImage from '../images/direct_transfer.svg'
 import ExternalLink from '@components/link/ExternalLink'
 import Button from '@components/button/Button'
